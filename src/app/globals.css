@@ -1,0 +1,348 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --background: #ffffff;
+    --foreground: #4a4a4a;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-lato);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .button-border-important {
+    border: 1px solid #dadada !important;
+  }
+  .button-border-important-hover {
+    border: 1px solid #b7b7b7 !important;
+  }
+}
+
+/* Section entrance animation */
+@keyframes sectionEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.section-entrance {
+  animation: sectionEntrance 0.2s ease-out forwards;
+}
+
+/* Modal grow animation - grows from island position */
+@keyframes modalGrow {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(1.20);
+    border-radius: 50px;
+    width: 240px;
+    height: 48px;
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+    border-radius: 24px;
+    width: calc(100vw - 32px);
+    height: 400px;
+  }
+}
+
+.animate-modal-grow {
+  animation: modalGrow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Island growth animation */
+@keyframes islandGrow {
+  0% {
+    border-radius: 50px;
+    padding: 12px;
+    height: auto;
+    width: auto;
+  }
+  50% {
+    border-radius: 16px;
+    padding: 24px;
+    height: 120px;
+    width: 280px;
+  }
+  100% {
+    border-radius: 50px;
+    padding: 12px;
+    height: auto;
+    width: auto;
+  }
+}
+
+.island-grow {
+  animation: islandGrow 0.4s ease-out;
+}
+
+/* Shimmer swoosh animation for badge text */
+@keyframes shimmerSwoosh {
+  0% {
+    transform: translateX(-100%) skewX(-20deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%) skewX(-20deg);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmerSwooshClipped {
+  0% {
+    transform: translateX(-100%) skewX(-20deg);
+    opacity: 0;
+    clip-path: inset(0);
+  }
+  10% {
+    opacity: 1;
+    clip-path: inset(0);
+  }
+  70% {
+    opacity: 1;
+    clip-path: inset(0);
+  }
+  100% {
+    transform: translateX(100%) skewX(-20deg);
+    opacity: 0;
+    clip-path: inset(0);
+  }
+}
+
+.shimmer-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 20%,
+    rgba(255, 0, 131, 0.8) 40%,
+    rgba(255, 0, 131, 1) 50%,
+    rgba(255, 0, 131, 0.8) 60%,
+    rgba(255, 255, 255, 0.4) 80%,
+    transparent 100%
+  );
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  animation: shimmerSwoosh 3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  z-index: 1;
+  will-change: transform;
+  border-radius: inherit;
+  clip-path: inset(0 round 0.5rem);
+  overflow: hidden;
+}
+
+/* FSD Badge grow animation - grows from center as if emerging from the line */
+@keyframes badgeGrow {
+  0% {
+    transform: translateX(-50%) scale(0.3);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes badgeGrowInner {
+  0% {
+    padding: 6px 8px;
+    border-radius: 0.5rem;
+  }
+  100% {
+    padding: 6px 8px;
+    border-radius: 0.5rem;
+  }
+}
+
+@keyframes badgeGrowText {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.badge-fly-in {
+  animation: badgeGrow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s forwards;
+  transform-origin: center top;
+  will-change: transform, opacity;
+  opacity: 0;
+}
+
+.badge-fly-in-inner {
+  animation: badgeGrowInner 0.35s ease-out forwards;
+}
+
+.badge-fly-in-text {
+  animation: badgeGrowText 0.4s ease-out forwards;
+}
+
+/* FSD Badge line-grow animation - grows from center as if emerging from separator line */
+@keyframes badgeLineGrow {
+  0% {
+    transform: translateX(-50%) scaleY(0.02);
+  }
+  100% {
+    transform: translateX(-50%) scaleY(1);
+  }
+}
+
+@keyframes badgeLineGrowText {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.badge-line-grow {
+  transform: translateX(-50%) scaleY(0.02);
+  transform-origin: center center;
+  animation: badgeLineGrow 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s forwards;
+  will-change: transform;
+}
+
+.badge-line-grow-inner {
+  padding: 6px 14px;
+  border-radius: 0.5rem;
+}
+
+.badge-line-grow-text {
+  animation: badgeLineGrowText 0.3s ease-out 0.5s forwards;
+  opacity: 0;
+}
+
+/* FSD Text swipe-in animation - text slides in from left */
+@keyframes fsdTextSwipeIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.fsd-text-swipe-in {
+  animation: fsdTextSwipeIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Shimmer text effect - gradient that sweeps through text only */
+@keyframes shimmerTextSweep {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+.shimmer-text-effect {
+  background: linear-gradient(
+    90deg,
+    #4a4a4a 0%,
+    #4a4a4a 40%,
+    #ff0083 50%,
+    #4a4a4a 60%,
+    #4a4a4a 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent !important;
+  animation: shimmerTextSweep 4s ease-in-out forwards;
+  animation-iteration-count: 1;
+}
+
+/* Celebratory stars animation - grows from nothing and fades out */
+@keyframes celebrationStars {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(0.7);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.6);
+    opacity: 0;
+  }
+}
+
+@keyframes celebrationStarsFlipped {
+  0% {
+    transform: translate(-50%, -50%) scale(0) scaleX(-1) scaleY(-1);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(0.7) scaleX(-1) scaleY(-1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.6) scaleX(-1) scaleY(-1);
+    opacity: 0;
+  }
+}
+
+.celebration-stars {
+  position: absolute;
+  z-index: 100;
+  pointer-events: none;
+  animation: celebrationStars 1.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.celebration-stars-flipped {
+  position: absolute;
+  z-index: 100;
+  pointer-events: none;
+  animation: celebrationStarsFlipped 1.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
