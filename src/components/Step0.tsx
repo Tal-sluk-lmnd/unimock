@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import EstimationCard, {
   type MilesOption,
   type FsdUsageOption,
@@ -8,6 +8,7 @@ import EstimationCard, {
 } from './EstimationCard'
 import SummaryPaymentCard from './SummaryPaymentCard'
 import Button from './Button'
+import CoveragesContent, { type CoveragePriceAdjustment } from './CoveragesContent'
 
 const MILES_LABELS: Record<MilesOption, string> = {
   'not-a-lot': 'Low mileage',
@@ -44,12 +45,13 @@ function getMilesForSelection(miles: MilesOption | null, customMileage: number):
   return MILES_DEFAULTS[miles]
 }
 
-function getCarUsageCost(miles: number, fsd: FsdUsageOption | null, hasFsd: boolean): number {
-  if (!hasFsd || !fsd) return miles * PER_MILE_RATE
+function getCarUsageCost(miles: number, fsd: FsdUsageOption | null, hasFsd: boolean, rateAddon: number = 0): number {
+  const rate = PER_MILE_RATE + rateAddon
+  if (!hasFsd || !fsd) return miles * rate
   const fsdShare = FSD_DISCOUNT_SHARE[fsd]
   const fsdMiles = miles * fsdShare
   const normalMiles = miles - fsdMiles
-  return normalMiles * PER_MILE_RATE + fsdMiles * PER_MILE_RATE * 0.5
+  return normalMiles * rate + fsdMiles * rate * 0.5
 }
 
 function getSummarySubtitle(
@@ -75,7 +77,7 @@ interface CarCardConfig {
 }
 
 const CAR_CARDS: CarCardConfig[] = [
-  { id: 'car-1', carName: "'25 Hyundai Tuscon", showFsd: true },
+  { id: 'car-1', carName: "'25 Tesla Model S", showFsd: true },
   { id: 'car-2', carName: "'25 Hyundai Tuscon", showFsd: false },
 ]
 
@@ -96,6 +98,9 @@ export default function Step0({ onNext }: Step0Props) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [completedSet, setCompletedSet] = useState<Set<number>>(() => new Set())
   const [quoteRevealed, setQuoteRevealed] = useState(false)
+  const [customizeCoverages, setCustomizeCoverages] = useState(false)
+  const [coverageAdj, setCoverageAdj] = useState<CoveragePriceAdjustment>({ baseAddon: 0, rateAddon: 0 })
+  const coveragesRef = useRef<HTMLDivElement>(null)
   const [selections, setSelections] = useState<CardSelections[]>(
     CAR_CARDS.map(() => ({ miles: null, fsd: null, customMileage: 500 }))
   )
@@ -159,11 +164,11 @@ export default function Step0({ onNext }: Step0Props) {
     const cars = CAR_CARDS.map((card, i) => {
       const sel = selections[i]
       const miles = getMilesForSelection(sel.miles, sel.customMileage)
-      const cost = getCarUsageCost(miles, sel.fsd, card.showFsd)
+      const cost = getCarUsageCost(miles, sel.fsd, card.showFsd, coverageAdj.rateAddon)
       totalUsage += cost
       totalMiles += miles
 
-      const effectiveRate = miles > 0 ? cost / miles : PER_MILE_RATE
+      const effectiveRate = miles > 0 ? cost / miles : PER_MILE_RATE + coverageAdj.rateAddon
 
       return {
         name: card.carName,
@@ -172,13 +177,15 @@ export default function Step0({ onNext }: Step0Props) {
       }
     })
 
+    const adjustedBase = BASE_PRICE + coverageAdj.baseAddon
+
     return {
       cars,
       totalUsage,
       totalMiles,
-      estimatedTotal: BASE_PRICE + totalUsage,
+      estimatedTotal: adjustedBase + totalUsage,
     }
-  }, [selections])
+  }, [selections, coverageAdj])
 
   const getCardMode = (index: number): EstimationCardMode => {
     if (index === activeIndex) return 'interactive'
@@ -210,7 +217,7 @@ export default function Step0({ onNext }: Step0Props) {
         paddingBottom: quoteRevealed ? '160px' : '71px',
       }}
     >
-      <div className="container mx-auto px-2 py-6 max-w-2xl flex flex-col gap-4 absolute top-[207px] left-0 right-0">
+      <div className="container mx-auto px-2 py-6 max-w-2xl flex flex-col gap-4 absolute top-[240px] left-0 right-0 bg-[#f7f7f7]">
         {CAR_CARDS.map((card, i) => (
           <div
             key={card.id}
@@ -248,7 +255,7 @@ export default function Step0({ onNext }: Step0Props) {
           }}
         >
           <div
-            className={`bg-white border border-[#ececec] flex flex-col relative rounded-xl shadow-[0px_9px_49px_2px_rgba(32,32,32,0.07)] w-full transition-all duration-300 ${
+            className={`bg-white border border-[#ececec] flex flex-col relative rounded-[24px] shadow-[0px_9px_49px_2px_rgba(32,32,32,0.07)] w-full transition-all duration-300 ${
               !quoteRevealed ? 'opacity-60' : ''
             }`}
           >
@@ -278,9 +285,10 @@ export default function Step0({ onNext }: Step0Props) {
                 <div className={`transition-opacity duration-500 ${quoteRevealed ? 'opacity-100' : 'opacity-0'}`}>
                   <SummaryPaymentCard
                     hideActions
-                    basePrice={`$${BASE_PRICE.toFixed(2)}`}
+                    compactPadding={customizeCoverages}
+                    basePrice={`$${(BASE_PRICE + coverageAdj.baseAddon).toFixed(2)}`}
                     cars={summaryData.cars}
-                    totalBasePrice={`$${BASE_PRICE.toFixed(2)}`}
+                    totalBasePrice={`$${(BASE_PRICE + coverageAdj.baseAddon).toFixed(2)}`}
                     totalUsage={`$${summaryData.totalUsage.toFixed(2)}`}
                     estimatedTotal={`$${summaryData.estimatedTotal.toFixed(2)}`}
                     totalMiles={summaryData.totalMiles}
@@ -290,30 +298,75 @@ export default function Step0({ onNext }: Step0Props) {
             </div>
           </div>
         </div>
+
+        {/* Coverages — revealed when "Customize coverages" is clicked */}
+        <div
+          ref={coveragesRef}
+          className="grid transition-[grid-template-rows] duration-500 ease-in-out"
+          style={{ gridTemplateRows: customizeCoverages ? '1fr' : '0fr' }}
+        >
+          <div className="overflow-hidden">
+            <div
+              className={`mt-4 transition-opacity duration-500 ${
+                customizeCoverages ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              <CoveragesContent onPriceChange={setCoverageAdj} />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Fixed bottom CTA bar */}
       <div
-        className="fixed bottom-0 left-0 right-0 px-4 py-4 flex flex-col items-center gap-3 transition-transform duration-400 ease-in-out z-50"
+        className="fixed bottom-0 left-0 right-0 px-6 pt-[72px] pb-6 flex flex-col items-center transition-transform duration-400 ease-in-out z-50"
         style={{
           transform: quoteRevealed ? 'translateY(0)' : 'translateY(100%)',
           background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.00) 0%, #FFF 41.67%)',
         }}
       >
-        <div className="w-full max-w-2xl flex flex-col items-center gap-3">
-          <Button
-            onClick={() => onNext()}
-            variant="primary"
-            className="w-full"
-          >
-            To checkout
-          </Button>
-          <button
-            type="button"
-            className="font-lato text-base leading-[1.47] text-[#4a4a4a] underline decoration-[#b7b7b7] underline-offset-2 hover:text-[#ff0083] hover:decoration-[#ff0083] transition-colors duration-200 pb-1"
-          >
-            Customize coverages
-          </button>
+        <div className="w-full max-w-2xl">
+          {customizeCoverages ? (
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col font-lato text-base text-[#4a4a4a]">
+                <p className="leading-[1.55]">
+                  Usage ({summaryData.totalMiles.toLocaleString()}mi)
+                </p>
+                <p className="font-bold leading-[1.55]">
+                  Estimated ${summaryData.estimatedTotal.toFixed(2)}/mo
+                </p>
+              </div>
+              <Button
+                onClick={() => onNext()}
+                variant="primary"
+                className="w-[137px] shrink-0"
+              >
+                To checkout
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-3">
+              <Button
+                onClick={() => onNext()}
+                variant="primary"
+                className="w-full"
+              >
+                To checkout
+              </Button>
+              <button
+                type="button"
+                onClick={() => {
+                  setCustomizeCoverages(true)
+                  setTimeout(() => {
+                    window.scrollBy({ top: 200, behavior: 'smooth' })
+                  }, 350)
+                }}
+                className="font-lato text-base leading-[1.47] text-[#4a4a4a] underline decoration-[#b7b7b7] underline-offset-2 hover:text-[#ff0083] hover:decoration-[#ff0083] transition-colors duration-200 pb-1"
+              >
+                Customize coverages
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

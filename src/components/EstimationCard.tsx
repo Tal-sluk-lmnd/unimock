@@ -136,18 +136,25 @@ export default function EstimationCard({
 
   return (
     <div
-      className={`bg-white border border-[#ececec] flex flex-col relative rounded-xl shadow-[0px_9px_49px_2px_rgba(32,32,32,0.07)] w-full transition-all duration-300 ${
+      className={`bg-white border border-[#ececec] flex flex-col relative rounded-3xl shadow-[0px_9px_49px_2px_rgba(32,32,32,0.07)] w-full transition-all duration-300 ${
         isClickable ? 'cursor-pointer hover:shadow-[0px_12px_52px_4px_rgba(32,32,32,0.10)]' : ''
       } ${mode === 'pending' ? 'opacity-60' : ''}`}
       onClick={isClickable ? onClick : undefined}
     >
-      <div className="flex flex-col gap-1 p-6 pb-5">
-        <p className="font-lato font-bold text-base leading-[1.47] text-[#4a4a4a]">
-          {carName}
-        </p>
-        <p className="font-lato text-base leading-[1.47] text-[#7b7b7b]">
-          {subtitle}
-        </p>
+      <div className="flex items-center gap-3 p-6 pb-5">
+        <div className="flex flex-col gap-1 min-w-0 flex-1">
+          <p className="font-lato font-bold text-base leading-[1.47] text-[#4a4a4a]">
+            {carName}
+          </p>
+          <p className="font-lato text-base leading-[1.47] text-[#7b7b7b]">
+            {subtitle}
+          </p>
+        </div>
+        {isCollapsed && showFsd && selectedFsd && (
+          <span className="shrink-0 font-lato text-xs font-bold leading-[1.47] text-[#ff0083] border border-[#ff0083] rounded-full px-2.5 py-0.5 whitespace-nowrap">
+            50% off FSD miles
+          </span>
+        )}
       </div>
 
       <div
