@@ -45,8 +45,8 @@ export default function SummaryPaymentCard({
       } ${className}`}
     >
       {/* Marketing banner */}
-      <div className="bg-white border border-[#ececec] flex h-[188px] items-start overflow-hidden rounded-lg shadow-[0px_12px_32px_-8px_rgba(32,32,32,0.08)] w-full">
-        <div className="flex flex-col h-full items-start justify-center pl-6 pr-4 py-6 w-[210px] shrink-0">
+      <div className="bg-white border border-[#ececec] grid grid-cols-2 grid-rows-1 h-[188px] items-start overflow-hidden rounded-lg shadow-[0px_12px_32px_-8px_rgba(32,32,32,0.08)] w-full">
+        <div className="flex flex-col h-full items-start justify-center pl-6 pr-4 py-6 w-full">
           <div className="flex flex-col gap-1 w-full">
             <p className="font-lato font-bold text-base leading-[1.47] text-[#4a4a4a] max-h-12 overflow-hidden">
               Introducing Lemonade Autonomous Car!
@@ -56,7 +56,7 @@ export default function SummaryPaymentCard({
             </p>
           </div>
         </div>
-        <div className="flex-1 h-full bg-[#f7f7f7] rounded-tr-2xl rounded-br-2xl relative overflow-hidden">
+        <div className="w-full h-full bg-[#f7f7f7] rounded-tr-2xl rounded-br-2xl relative overflow-hidden">
           <div className="absolute inset-0 flex items-center justify-center">
             <Image
               src="/Tesla23FSD.png"
