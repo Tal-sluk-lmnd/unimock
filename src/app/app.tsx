@@ -48,11 +48,13 @@ export default function App() {
 
   return (
     <div className="min-h-screen relative" style={{ backgroundColor: '#f7f7f7' }}>
-      <img
-        src="/Live Policy_Background Image.png"
-        alt=""
-        className="absolute top-[62px] left-0 w-full h-[188px] object-cover"
-      />
+      <div className="absolute top-0 w-full h-[220px] bg-[#FFFFFF]">
+        <img
+          src="/Live Policy_Background Image.png"
+          alt=""
+          className="absolute top-[26px] w-full h-full object-contain scale-130"
+        />
+      </div>
 
       {/* Header Rendering */}
       <Header />

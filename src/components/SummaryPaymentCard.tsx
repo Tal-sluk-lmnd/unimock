@@ -47,14 +47,14 @@ export default function SummaryPaymentCard({
       } ${className}`}
     >
       {/* Marketing banner */}
-      <div className="bg-white border border-[#ececec] grid grid-cols-[280px_1fr] grid-rows-1 h-[188px] items-start overflow-hidden rounded-3xl shadow-[0px_12px_32px_-8px_rgba(32,32,32,0.08)] w-full">
+      <div className="bg-white border border-[#ececec] grid grid-cols-2 grid-rows-1 h-[188px] items-start overflow-hidden rounded-3xl shadow-[0px_12px_32px_-8px_rgba(32,32,32,0.08)] w-full">
         <div className="flex flex-col h-full items-start justify-center pl-6 pr-4 py-6 w-full">
           <div className="flex flex-col gap-1 w-full">
-            <p className="font-lato font-bold text-base leading-[1.47] text-[#4a4a4a] max-h-12 overflow-hidden">
-              Introducing Lemonade Autonomous Car!
+            <p className="font-lato font-bold text-base leading-[1.47] text-[#4a4a4a]">
+              Lemonade Autonomous Car!
             </p>
             <p className="font-lato text-sm leading-[1.47] text-[#4a4a4a]">
-              We&apos;ll calculate your usage and apply discounts on a monthly basis.
+              Here&apos;s how we calculate your usage and apply discounts on a monthly basis.
             </p>
           </div>
         </div>
