@@ -18,9 +18,9 @@ const MILES_LABELS: Record<MilesOption, string> = {
 }
 
 const FSD_LABELS: Record<FsdUsageOption, string> = {
-  'almost-never': 'low FSD usage',
-  'sometimes': 'moderate FSD usage',
-  'all-the-time': 'high FSD usage',
+  'almost-never': 'low FSD',
+  'sometimes': 'FSD',
+  'all-the-time': 'heavy FSD',
 }
 
 const BASE_PRICE = 45.48
@@ -65,7 +65,7 @@ function getSummarySubtitle(
     ? `${customMileage.toLocaleString()} miles`
     : MILES_LABELS[miles]
   if (showFsd && fsd) {
-    return `${milesLabel}, ${FSD_LABELS[fsd]}`
+    return `${milesLabel} with ${FSD_LABELS[fsd]}`
   }
   return milesLabel
 }
@@ -153,6 +153,10 @@ export default function Step0({ onNext }: Step0Props) {
     }
   }, [])
 
+  const handleScrollOut = useCallback((index: number) => {
+    setActiveIndex((current) => (current === index ? null : current))
+  }, [])
+
   const handleCardTap = useCallback((index: number) => {
     setActiveIndex(index)
   }, [])
@@ -190,6 +194,9 @@ export default function Step0({ onNext }: Step0Props) {
   const getCardMode = (index: number): EstimationCardMode => {
     if (index === activeIndex) return 'interactive'
     if (completedSet.has(index)) return 'completed'
+    if (selections[index].miles !== null) return 'readonly'
+    if (activeIndex === null && index === 0) return 'readonly'
+    if (activeIndex !== null && index < activeIndex) return 'readonly'
     return 'pending'
   }
 
@@ -217,6 +224,14 @@ export default function Step0({ onNext }: Step0Props) {
         paddingBottom: quoteRevealed ? '160px' : '71px',
       }}
     >
+      <div className="absolute top-0 w-full h-[220px] bg-[#FFFFFF]">
+        <img
+          src="/Live Policy_Background Image.png"
+          alt=""
+          className="absolute top-[88px] w-full h-full object-contain scale-[1.6]"
+        />
+      </div>
+
       <div className="container mx-auto px-2 py-6 max-w-2xl flex flex-col gap-4 absolute top-[240px] left-0 right-0 bg-[#f7f7f7]">
         {CAR_CARDS.map((card, i) => (
           <div
@@ -240,6 +255,7 @@ export default function Step0({ onNext }: Step0Props) {
               onFsdSelect={(opt) => handleFsdSelect(i, opt)}
               onCustomMileageChange={(val) => handleCustomMileageChange(i, val)}
               onComplete={() => handleComplete(i)}
+              onScrollOut={() => handleScrollOut(i)}
               onClick={() => handleCardTap(i)}
             />
           </div>
@@ -282,7 +298,7 @@ export default function Step0({ onNext }: Step0Props) {
               style={{ gridTemplateRows: quoteRevealed ? '1fr' : '0fr' }}
             >
               <div className="overflow-hidden">
-                <div className={`transition-opacity duration-500 ${quoteRevealed ? 'opacity-100' : 'opacity-0'}`}>
+                <div className={`transition-opacity duration-700 delay-200 ${quoteRevealed ? 'opacity-100' : 'opacity-0'}`}>
                   <SummaryPaymentCard
                     hideActions
                     compactPadding={customizeCoverages}

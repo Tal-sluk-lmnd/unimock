@@ -29,6 +29,7 @@ interface EstimationCardProps {
   onFsdSelect?: (option: FsdUsageOption) => void
   onCustomMileageChange?: (value: number) => void
   onComplete?: () => void
+  onScrollOut?: () => void
   onClick?: () => void
 }
 
@@ -57,12 +58,15 @@ export default function EstimationCard({
   onFsdSelect,
   onCustomMileageChange,
   onComplete,
+  onScrollOut,
   onClick,
 }: EstimationCardProps) {
   const [internalMiles, setInternalMiles] = useState<MilesOption | null>(null)
   const [internalFsd, setInternalFsd] = useState<FsdUsageOption | null>(null)
   const [internalCustomMileage, setInternalCustomMileage] = useState(500)
   const completeFiredRef = useRef(false)
+  const customSliderTouchedRef = useRef(false)
+  const cardRef = useRef<HTMLDivElement>(null)
 
   const customMileage = controlledCustomMileage !== undefined ? controlledCustomMileage : internalCustomMileage
 
@@ -82,6 +86,7 @@ export default function EstimationCard({
   }
 
   const handleCustomMileageChange = (value: number) => {
+    customSliderTouchedRef.current = true
     setInternalCustomMileage(value)
     onCustomMileageChange?.(value)
   }
@@ -109,6 +114,7 @@ export default function EstimationCard({
   useEffect(() => {
     if (mode !== 'interactive' || completeFiredRef.current) return
     if (selectedMiles !== 'custom' || showFsd) return
+    if (!customSliderTouchedRef.current) return
 
     if (customIdleTimerRef.current) clearTimeout(customIdleTimerRef.current)
 
@@ -127,8 +133,25 @@ export default function EstimationCard({
   useEffect(() => {
     if (mode === 'interactive') {
       completeFiredRef.current = false
+      customSliderTouchedRef.current = false
     }
   }, [mode])
+
+  useEffect(() => {
+    if (mode !== 'interactive' || !cardRef.current) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          onScrollOut?.()
+        }
+      },
+      { threshold: 0 }
+    )
+
+    observer.observe(cardRef.current)
+    return () => observer.disconnect()
+  }, [mode, onScrollOut])
 
   const isCollapsed = mode !== 'interactive'
   const isClickable = isCollapsed && mode !== 'pending'
@@ -136,25 +159,26 @@ export default function EstimationCard({
 
   return (
     <div
+      ref={cardRef}
       className={`bg-white border border-[#ececec] flex flex-col relative rounded-3xl shadow-[0px_9px_49px_2px_rgba(32,32,32,0.07)] w-full transition-all duration-300 ${
         isClickable ? 'cursor-pointer hover:shadow-[0px_12px_52px_4px_rgba(32,32,32,0.10)]' : ''
       } ${mode === 'pending' ? 'opacity-60' : ''}`}
       onClick={isClickable ? onClick : undefined}
     >
-      <div className="flex items-center gap-3 p-6 pb-5">
-        <div className="flex flex-col gap-1 min-w-0 flex-1">
-          <p className="font-lato font-bold text-base leading-[1.47] text-[#4a4a4a]">
+      <div className="flex flex-col gap-1 p-6 pb-5">
+        <div className="flex items-center gap-3">
+          <p className="font-lato font-bold text-base leading-[1.47] text-[#4a4a4a] min-w-0 flex-1">
             {carName}
           </p>
-          <p className="font-lato text-base leading-[1.47] text-[#7b7b7b]">
-            {subtitle}
-          </p>
+          {showFsd && (isExpanded || (isCollapsed && selectedFsd)) && (
+            <span className="shrink-0 font-lato text-xs font-bold leading-[1.47] text-[#ff0083] border border-[#ff0083] rounded-full px-2.5 py-0.5 whitespace-nowrap">
+              50% off FSD miles
+            </span>
+          )}
         </div>
-        {isCollapsed && showFsd && selectedFsd && (
-          <span className="shrink-0 font-lato text-xs font-bold leading-[1.47] text-[#ff0083] border border-[#ff0083] rounded-full px-2.5 py-0.5 whitespace-nowrap">
-            50% off FSD miles
-          </span>
-        )}
+        <p className="font-lato text-base leading-[1.47] text-[#4a4a4a]">
+          {subtitle}{isExpanded && <span className="text-red-500">*</span>}
+        </p>
       </div>
 
       <div
@@ -229,13 +253,15 @@ export default function EstimationCard({
                 <div className="mx-6 h-px bg-[#ececec]" />
 
                 <div className="flex flex-col gap-3 px-6 py-5">
-                  <div className="flex items-center gap-3 flex-wrap">
+                  <div className="flex items-center gap-1.5">
                     <p className="font-lato text-base leading-[1.47] text-[#4a4a4a]">
-                      Whats your FSD usage?
+                      Whats your FSD usage?{isExpanded && <span className="text-red-500">*</span>}
                     </p>
-                    <span className="font-lato text-xs font-bold leading-[1.47] text-[#ff0083] border border-[#ff0083] rounded-full px-2.5 py-0.5">
-                      50% off FSD miles
-                    </span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0 cursor-pointer">
+                      <circle cx="8" cy="8" r="7" stroke="#b7b7b7" strokeWidth="1.5" />
+                      <path d="M8 7V11" stroke="#b7b7b7" strokeWidth="1.5" strokeLinecap="round" />
+                      <circle cx="8" cy="5" r="0.75" fill="#b7b7b7" />
+                    </svg>
                   </div>
 
                   <div className="flex gap-2">

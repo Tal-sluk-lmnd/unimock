@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
 import Button from './Button'
 
@@ -9,6 +9,14 @@ interface CarUsage {
   rate: string
   rateBreakdown: string
 }
+
+const DISCOUNTS = [
+  { title: 'Safe driver', amount: '-$7.45/mo' },
+  { title: 'No previous claims', amount: '-$11.45/mo' },
+  { title: 'Multi-car bundle', amount: '-$5.55/mo' },
+]
+
+const TOTAL_DISCOUNT = '-$24.45'
 
 interface SummaryPaymentCardProps {
   basePrice?: string
@@ -40,6 +48,8 @@ export default function SummaryPaymentCard({
   compactPadding = false,
   className = '',
 }: SummaryPaymentCardProps) {
+  const [discountsExpanded, setDiscountsExpanded] = useState(false)
+
   return (
     <div
       className={`flex flex-col items-center overflow-hidden w-full ${
@@ -51,7 +61,7 @@ export default function SummaryPaymentCard({
         <div className="flex flex-col h-full items-start justify-center pl-6 pr-4 py-6 w-full">
           <div className="flex flex-col gap-1 w-full">
             <p className="font-lato font-bold text-base leading-[1.47] text-[#4a4a4a]">
-              Lemonade Autonomous Car!
+              Lemonade Autonomous Car
             </p>
             <p className="font-lato text-sm leading-[1.47] text-[#4a4a4a]">
               Here&apos;s how we calculate your usage and apply discounts on a monthly basis.
@@ -71,7 +81,7 @@ export default function SummaryPaymentCard({
       </div>
 
       {/* Content */}
-      <div className={`flex flex-col items-start pt-6 px-6 w-full ${compactPadding ? 'pb-6' : 'pb-[124px]'}`}>
+      <div className={`flex flex-col items-start pt-8 px-6 w-full ${compactPadding ? 'pb-6' : 'pb-[124px]'}`}>
         <div className="flex flex-col gap-4 items-start w-full">
           {/* Base price */}
           <div className="flex flex-col items-start w-full">
@@ -79,7 +89,7 @@ export default function SummaryPaymentCard({
               <div className="font-lato text-base text-[#4a4a4a]">
                 <p className="leading-[1.47]">
                   <span className="font-bold">Your base price </span>
-                  <span className="text-[#949494]">(when cars are stationary)</span>
+                  <span className="text-[#949494]">(when no one is driving)</span>
                 </p>
                 <p className="leading-[1.47]">{basePrice}</p>
               </div>
@@ -109,6 +119,61 @@ export default function SummaryPaymentCard({
                 </p>
               </div>
             ))}
+          </div>
+
+          {/* Separator */}
+          <div className="bg-[#ececec] h-px w-full" />
+
+          {/* Discounts (collapsible) */}
+          <div className="flex flex-col items-start w-full">
+            <button
+              type="button"
+              onClick={() => setDiscountsExpanded(!discountsExpanded)}
+              className="flex items-center justify-between w-full cursor-pointer"
+            >
+              <div className="flex items-center gap-1.5">
+                <span className="font-lato text-base leading-[1.47] text-[#4a4a4a]">
+                  {DISCOUNTS.length} Discounts
+                </span>
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  className={`transition-transform duration-300 ${discountsExpanded ? 'rotate-180' : ''}`}
+                >
+                  <path d="M2.5 4.5L6 8L9.5 4.5" stroke="#4a4a4a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <span className="font-lato text-base leading-[1.47] text-[#ff0083]">
+                {TOTAL_DISCOUNT}
+              </span>
+            </button>
+
+            <div
+              className="grid w-full transition-[grid-template-rows] duration-300 ease-in-out"
+              style={{ gridTemplateRows: discountsExpanded ? '1fr' : '0fr' }}
+            >
+              <div className="overflow-hidden">
+                <div className="flex flex-col gap-2.5 pt-3">
+                  {DISCOUNTS.map((discount) => (
+                    <div key={discount.title} className="flex items-center gap-2 w-full">
+                      <div className="w-4 h-4 bg-pink-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                          <path d="M2 6L5 9L10 3" stroke="#FF0083" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </div>
+                      <span className="font-lato text-base leading-[1.47] text-[#4a4a4a] flex-1">
+                        {discount.title}
+                      </span>
+                      <span className="font-lato text-base leading-[1.47] text-[#4a4a4a]">
+                        {discount.amount}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Separator */}

@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import Header from '../components/Header'
 import HeaderFloat from '../components/HeaderFloat'
+import HowItWorks from '../components/HowItWorks'
 import Step0 from '../components/Step0'
 import Step1 from '../components/Step1'
 import Step2 from '../components/Step2'
@@ -36,28 +37,22 @@ export default function App() {
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 0:
-        return <Step0 onNext={handleNext} showBottomButtons={showBottomButtons} />
+        return <HowItWorks onNext={handleNext} />
       case 1:
-        return <Step1 onNext={handleNext} showBottomButtons={showBottomButtons} />
+        return <Step0 onNext={handleNext} showBottomButtons={showBottomButtons} />
       case 2:
+        return <Step1 onNext={handleNext} showBottomButtons={showBottomButtons} />
+      case 3:
         return <Step2 onNext={handleNext} onPrevious={handlePrevious} showBottomButtons={showBottomButtons} />
       default:
-        return <Step0 onNext={handleNext} showBottomButtons={showBottomButtons} />
+        return <HowItWorks onNext={handleNext} />
     }
   }
 
   return (
     <div className="min-h-screen relative" style={{ backgroundColor: '#f7f7f7' }}>
-      <div className="absolute top-0 w-full h-[220px] bg-[#FFFFFF]">
-        <img
-          src="/Live Policy_Background Image.png"
-          alt=""
-          className="absolute top-[26px] w-full h-full object-contain scale-130"
-        />
-      </div>
-
       {/* Header Rendering */}
-      <Header />
+      <Header onBack={handlePrevious} />
 
       {/* Render current step */}
       {renderCurrentStep()}
