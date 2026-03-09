@@ -50,7 +50,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen relative" style={{ backgroundColor: '#f7f7f7' }}>
+    <div className="min-h-screen relative overflow-x-hidden" style={{ backgroundColor: '#f7f7f7' }}>
       {/* Header Rendering */}
       <Header onBack={handlePrevious} />
 
