@@ -232,7 +232,7 @@ export default function Step0({ onNext }: Step0Props) {
         />
       </div>
 
-      <div className="container mx-auto px-2 py-6 max-w-2xl flex flex-col gap-4 absolute top-[240px] left-0 right-0 bg-[#f7f7f7]">
+      <div className="container mx-auto px-2 py-6 max-w-2xl flex flex-col gap-4 relative mt-[160px] bg-[#f7f7f7]">
         {CAR_CARDS.map((card, i) => (
           <div
             key={card.id}

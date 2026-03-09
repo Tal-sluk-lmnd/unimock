@@ -252,7 +252,7 @@ export default function EstimationCard({
               <>
                 <div className="mx-6 h-px bg-[#ececec]" />
 
-                <div className="flex flex-col gap-3 px-6 py-5">
+                <div className="flex flex-col gap-4 px-6 py-6">
                   <div className="flex items-center gap-1.5">
                     <p className="font-lato text-base leading-[1.47] text-[#4a4a4a]">
                       Whats your FSD usage?{isExpanded && <span className="text-red-500">*</span>}
