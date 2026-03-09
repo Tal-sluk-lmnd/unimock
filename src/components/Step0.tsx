@@ -224,7 +224,7 @@ export default function Step0({ onNext }: Step0Props) {
         paddingBottom: quoteRevealed ? '160px' : '71px',
       }}
     >
-      <div className="absolute top-0 w-full h-[220px] bg-[#FFFFFF] overflow-hidden">
+      <div className="absolute top-0 w-full h-[220px] bg-[#FFFFFF] overflow-clip">
         <img
           src="/Live Policy_Background Image.png"
           alt=""
